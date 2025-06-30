@@ -5,11 +5,54 @@ open Core
    the corresponding position in the background image instead of
    just ignoring the background image and returning the foreground image.
 *)
-let transform ~foreground ~background:_ = foreground
+let transform ~foreground ~background =
+  (* let x_indexes = List.init (Image.width background) ~f:(fun x -> x) in
+     let y_indexes = List.init (Image.height background) ~f:(fun x -> x) in
+     List.iter x_indexes ~f:(fun i ->
+     List.iter y_indexes ~f:(fun j ->
+     let the_pixel = Image.get foreground ~x:i ~y:j in
+     if Pixel.blue the_pixel > Pixel.green the_pixel + Pixel.red the_pixel
+     then (
+     let new_pixel = Image.get background ~x:i ~y:j in
+     Image.set foreground new_pixel ~x:i ~y:i)
+     else ()));
+     Image.copy foreground \ *)
+  Image.mapi foreground ~f:(fun ~x:i ~y:j pixel ->
+    if Pixel.blue pixel > Pixel.red pixel + Pixel.green pixel
+    then Image.get background ~x:i ~y:j
+    else Image.get foreground ~x:i ~y:j)
+;;
+
+let%expect_test "bluescreen" =
+  let correct_image =
+    Image.load_ppm
+      ~filename:"/home/ubuntu/raster/images/reference-oz_bluescreen_vfx.ppm"
+  in
+  let my_image =
+    Image.load_ppm ~filename:"/home/ubuntu/raster/images/oz_bluescreen.ppm"
+  in
+  (* Image.map my_image ~f: *)
+  let x_indexes = List.init (Image.width my_image) ~f:(fun x -> x) in
+  let y_indexes = List.init (Image.height my_image) ~f:(fun x -> x) in
+  print_s [%message (x_indexes : int list)];
+  print_s [%message (y_indexes : int list)];
+  List.iter x_indexes ~f:(fun i ->
+    List.iter y_indexes ~f:(fun j ->
+      if
+        Pixel.equal
+          (Image.get ~x:i ~y:j my_image)
+          (Image.get ~x:i ~y:j correct_image)
+      then print_string "We good! "
+      else
+        print_string
+          ("Incorrect at " ^ string_of_int i ^ ", " ^ string_of_int j ^ "\n")));
+  [%expect]
+;;
 
 let command =
   Command.basic
-    ~summary:"Replace the 'blue' pixels of an image with those from another image"
+    ~summary:
+      "Replace the 'blue' pixels of an image with those from another image"
     [%map_open.Command
       let foreground_file =
         flag
@@ -28,5 +71,7 @@ let command =
         let image' = transform ~foreground ~background in
         Image.save_ppm
           image'
-          ~filename:(String.chop_suffix_exn foreground_file ~suffix:".ppm" ^ "_vfx.ppm")]
+          ~filename:
+            (String.chop_suffix_exn foreground_file ~suffix:".ppm"
+             ^ "_vfx.ppm")]
 ;;
