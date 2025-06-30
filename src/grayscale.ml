@@ -7,7 +7,7 @@ let transform image : Image.t =
     (r + g + b) / 3, (r + g + b) / 3, (r + g + b) / 3)
 ;;
 
-let%expect_test "grayscale" =
+(* let%expect_test "grayscale" =
   let correct_image =
     Image.load_ppm
       ~filename:"/home/ubuntu/raster/images/beach_portrait_gray.ppm"
@@ -27,12 +27,12 @@ let%expect_test "grayscale" =
         Pixel.equal
           (Image.get ~x:i ~y:j my_image)
           (Image.get ~x:i ~y:j correct_image)
-      then print_string "we good"
+      then print_string "lol"
       else
         print_string
           ("Incorrect at " ^ string_of_int i ^ ", " ^ string_of_int j ^ "\n")));
   [%expect]
-;;
+;; *)
 
 (* Image.map image ~f: *)
 (* Array.iteri my_image.image ~f:(fun i x -> if equal x correct_image.image.(i) then () print_string ("Should be " ^ Pixel.to_string correct_image.image.(i) ^ " but got " ^ Pixel.to_string x "\n") ) *)

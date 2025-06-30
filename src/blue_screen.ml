@@ -17,10 +17,10 @@ let transform ~foreground ~background =
      Image.set foreground new_pixel ~x:i ~y:i)
      else ()));
      Image.copy foreground \ *)
-  Image.mapi foreground ~f:(fun ~x:i ~y:j pixel ->
-    if Pixel.blue pixel > Pixel.red pixel + Pixel.green pixel
-    then Image.get background ~x:i ~y:j
-    else Image.get foreground ~x:i ~y:j)
+  Image.mapi foreground ~f:(fun ~x ~y (r, g, b) ->
+    if r > g + b
+    then Image.get background ~x ~y
+    else Image.get foreground ~x ~y)
 ;;
 
 let%expect_test "bluescreen" =
@@ -29,13 +29,19 @@ let%expect_test "bluescreen" =
       ~filename:"/home/ubuntu/raster/images/reference-oz_bluescreen_vfx.ppm"
   in
   let my_image =
-    Image.load_ppm ~filename:"/home/ubuntu/raster/images/oz_bluescreen.ppm"
+    Image.load_ppm
+      ~filename:"/home/ubuntu/raster/images/oz_bluescreen_vfx.ppm"
   in
+  (* let output =
+     Image.foldi my_image 0 ~f:(fun ~x:i ~y:j vari pixel ->
+     if Pixel.equal (Image.get ~x:i ~y:j correct_image) pixel
+     then vari
+     else vari + 1)
+     in
+     output *)
   (* Image.map my_image ~f: *)
   let x_indexes = List.init (Image.width my_image) ~f:(fun x -> x) in
   let y_indexes = List.init (Image.height my_image) ~f:(fun x -> x) in
-  print_s [%message (x_indexes : int list)];
-  print_s [%message (y_indexes : int list)];
   List.iter x_indexes ~f:(fun i ->
     List.iter y_indexes ~f:(fun j ->
       if
@@ -44,8 +50,12 @@ let%expect_test "bluescreen" =
           (Image.get ~x:i ~y:j correct_image)
       then print_string "We good! "
       else
-        print_string
-          ("Incorrect at " ^ string_of_int i ^ ", " ^ string_of_int j ^ "\n")));
+        print_s
+          [%message
+            (Image.get ~x:i ~y:j my_image : Pixel.t)
+              (Image.get ~x:i ~y:j correct_image : Pixel.t)
+              (i : int)
+              (j : int)]));
   [%expect]
 ;;
 

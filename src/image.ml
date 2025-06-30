@@ -9,6 +9,7 @@ type t =
   }
 [@@deriving sexp_of, fields ~getters]
 
+
 let load_ppm ~filename =
   let lines = In_channel.read_lines filename in
   (* Magic number for plain ppm format *)
