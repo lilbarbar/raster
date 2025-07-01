@@ -48,7 +48,7 @@ let%expect_test "bluescreen" =
         Pixel.equal
           (Image.get ~x:i ~y:j my_image)
           (Image.get ~x:i ~y:j correct_image)
-      then print_string "We good! "
+      then ()
       else
         print_s
           [%message
