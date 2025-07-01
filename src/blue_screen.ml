@@ -18,7 +18,7 @@ let transform ~foreground ~background =
      else ()));
      Image.copy foreground \ *)
   Image.mapi foreground ~f:(fun ~x ~y (r, g, b) ->
-    if r > g + b
+    if Float.compare (float_of_int b) (0.9 *. float_of_int (g + r)) > 0
     then Image.get background ~x ~y
     else Image.get foreground ~x ~y)
 ;;
