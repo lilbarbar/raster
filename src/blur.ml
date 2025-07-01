@@ -8,42 +8,48 @@ let transform image ~radius =
       (Image.slice
          image
          ~x_start:(max 0 (x - radius))
-         ~x_end:(min (x + radius) (Image.width image))
+         ~x_end:(min (x + radius) (Image.width image - 1))
          ~y_start:(max 0 (y - radius))
-         ~y_end:(min (y + radius) (Image.height image))))
+         ~y_end:(min (y + radius) (Image.height image - 1))))
 ;;
 
-(* let%expect_test "blur" =
-   let correct_image =
-   Image.load_ppm
-   ~filename:"/home/ubuntu/raster/images/beach_portrait_blur.ppm"
-   in
-   let my_image =
-   Image.load_ppm
-   ~filename:
-   "/home/ubuntu/raster/images/reference-beach_portrait_blur.ppm"
-   in
-   (* let output =
+let%expect_test "blur" =
+  let correct_image =
+    Image.load_ppm
+      ~filename:"/home/ubuntu/raster/images/beach_portrait_blur.ppm"
+  in
+  let my_image =
+    Image.load_ppm
+      ~filename:
+        "/home/ubuntu/raster/images/reference-beach_portrait_blur.ppm"
+  in
+  (* let output =
    Image.foldi my_image 0 ~f:(fun ~x:i ~y:j vari pixel ->
    if Pixel.equal (Image.get ~x:i ~y:j correct_image) pixel
    then vari
    else vari + 1)
    in
    output *)
-   (* Image.map my_image ~f: *)
-   let x_indexes = List.init (Image.width my_image) ~f:(fun x -> x) in
-   let y_indexes = List.init (Image.height my_image) ~f:(fun x -> x) in
-   List.iter x_indexes ~f:(fun i ->
-   List.iter y_indexes ~f:(fun j ->
-   if
-   Pixel.equal
-   (Image.get ~x:i ~y:j my_image)
-   (Image.get ~x:i ~y:j correct_image)
-   then print_string "We good! "
-   else
-   print_s
-   [%message (Image.get ~x:i ~y:j my_image : Pixel.t) (Image.get ~x:i ~y:j correct_image : Pixel.t) (i : int) (j : int)]));
-   [%expect] *)
+  (* Image.map my_image ~f: *)
+  let x_indexes = List.init (Image.width my_image) ~f:(fun x -> x) in
+  let y_indexes = List.init (Image.height my_image) ~f:(fun x -> x) in
+  List.iter x_indexes ~f:(fun i ->
+    List.iter y_indexes ~f:(fun j ->
+      if
+        Pixel.equal
+          (Image.get ~x:i ~y:j my_image)
+          (Image.get ~x:i ~y:j correct_image)
+      then ()
+      else
+        print_s
+          [%message
+            (Image.get ~x:i ~y:j my_image : Pixel.t)
+              (Image.get ~x:i ~y:j correct_image : Pixel.t)
+              (i : int)
+              (j : int)]));
+  [%expect]
+;;
+
 let command =
   Command.basic
     ~summary:"Blur an image"

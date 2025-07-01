@@ -45,7 +45,7 @@ let transform image =
   let new_image = Grayscale.transform image in
   let max_val_color = Image.max_val new_image in
   Image.mapi new_image ~f:(fun ~x ~y (r, _, _) ->
-    if r >= max_val_color / 2
+    if r > max_val_color / 2
     then dither new_image ~x ~y max_val_color
     else dither new_image ~x ~y 0)
 ;;
@@ -68,6 +68,7 @@ let%expect_test "dither" =
      in
      output *)
   (* Image.map my_image ~f: *)
+  let differences = ref 0 in
   let x_indexes = List.init (Image.width my_image) ~f:(fun x -> x) in
   let y_indexes = List.init (Image.height my_image) ~f:(fun x -> x) in
   List.iter x_indexes ~f:(fun i ->
@@ -76,8 +77,12 @@ let%expect_test "dither" =
         Pixel.equal
           (Image.get ~x:i ~y:j my_image)
           (Image.get ~x:i ~y:j correct_image)
-      then print_string "we good! "
-      else print_s [%message (i : int) (j : int)]));
+      then
+        (* print_string "we good! " *)
+        ()
+        (* else print_s [%message (i : int) (j : int)])); *)
+      else incr differences));
+  string_of_int !differences |> print_endline;
   [%expect]
 ;;
 
