@@ -23,28 +23,28 @@ let transform ~foreground ~background =
     else Image.get foreground ~x ~y)
 ;;
 
-let solarize image ~threshold =
-  let threshold_color = float_of_int (Image.max_val image) *. threshold in
-  let red_scan =
-    Image.map image ~f:(fun (r, g, b) ->
-      if Float.compare (float_of_int r) threshold_color > 0
-      then r, g, b
-      else Image.max_val image - r, g, b)
-  in
-  let green_scan =
-    Image.map red_scan ~f:(fun (r, g, b) ->
-      if Float.compare (float_of_int g) threshold_color > 0
-      then r, g, b
-      else r, Image.max_val image - g, b)
-  in
-  let blue_scan =
-    Image.map green_scan ~f:(fun (r, g, b) ->
-      if Float.compare (float_of_int b) threshold_color > 0
-      then r, g, b
-      else r, g, Image.max_val image - b)
-  in
-  blue_scan
-;;
+(* let solarize image ~threshold =
+   let threshold_color = float_of_int (Image.max_val image) *. threshold in
+   let red_scan =
+   Image.map image ~f:(fun (r, g, b) ->
+   if Float.compare (float_of_int r) threshold_color > 0
+   then r, g, b
+   else Image.max_val image - r, g, b)
+   in
+   let green_scan =
+   Image.map red_scan ~f:(fun (r, g, b) ->
+   if Float.compare (float_of_int g) threshold_color > 0
+   then r, g, b
+   else r, Image.max_val image - g, b)
+   in
+   let blue_scan =
+   Image.map green_scan ~f:(fun (r, g, b) ->
+   if Float.compare (float_of_int b) threshold_color > 0
+   then r, g, b
+   else r, g, Image.max_val image - b)
+   in
+   blue_scan
+   ;; *)
 
 let%expect_test "bluescreen" =
   let correct_image =
